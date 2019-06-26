@@ -1,8 +1,9 @@
 var {MongoClient} = require("mongodb");
 var dotenv = require('dotenv');
-if (process.env.NODE_ENV !== 'production') require('dotenv').config()
+if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
+var cors = require('cors');
 var path = require('path');
 var logger = require('morgan');
 var graphqlHTTP = require('express-graphql');
@@ -10,6 +11,25 @@ var schema = require('./quoteSchema');
 var server = express();
 server.use(logger('dev'));
 
+//CORS
+var allowedOrigins = ['http://fosteman.info', ''];
+server.use(cors({
+  origin: function(origin, callback){
+    // allow requests with no origin
+    // (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      var msg =
+          `CORS policy of my api restricts access to my apps, like fosteman.info. 
+          To access my api browse graphiqlUI located at https://graphql-api-backend.herokuapp.com/api instead!
+          `;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
+
+//MongoDB Backend
 MongoClient.connect(process.env.MONGODB_URI, (err, client) => {
   if (err) throw new Error(err.message);
   var db = client.db('NodeWorks');

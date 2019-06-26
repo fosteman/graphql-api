@@ -1,6 +1,6 @@
 var {MongoClient} = require("mongodb");
 var dotenv = require('dotenv');
-const result = dotenv.config();
+var result = dotenv.config();
 if (result.error) throw result.error;
 var createError = require('http-errors');
 var express = require('express');
@@ -13,10 +13,10 @@ server.use(logger('dev'));
 
 MongoClient.connect(process.env.MONGODB_URI, (err, client) => {
   if (err) throw new Error(err.message);
-  let db = client.db('NodeWorks');
+  var db = client.db('NodeWorks');
   console.log('Connected to MongoDB server');
   server.use('/api', graphqlHTTP({
-    schema: schema,
+    schema,
     context: {db},
     graphiql: true
   }));

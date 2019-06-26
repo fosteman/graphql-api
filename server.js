@@ -1,7 +1,6 @@
 var {MongoClient} = require("mongodb");
 var dotenv = require('dotenv');
-var result = dotenv.config();
-if (result.error) throw result.error;
+if (process.env.NODE_ENV !== 'production') require('dotenv').config()
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');

@@ -51,4 +51,4 @@ const connectBackend = async () => await
             }));
             server.listen(process.env.PORT || 8080);
         });
-
+connectBackend();

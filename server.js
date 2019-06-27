@@ -43,12 +43,17 @@ const connectBackend = async () => await
             if (err) throw new Error(err.message);
             const db = client.db('NodeWorks');
             console.log('Connected to MongoDB server');
-            //Create api endpoint
+            //Cache the Schema
+            require('./cache');
+
+            //Create API endpoint
             server.use('/api', graphqlHTTP({
                 schema,
                 context: {db},
                 graphiql: true
             }));
+
+            //Run the service
             server.listen(process.env.PORT || 8080);
         });
 connectBackend();

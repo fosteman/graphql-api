@@ -9,6 +9,7 @@ const logger = require('morgan');
 const graphqlHTTP = require('express-graphql');
 const schema = require('./quoteSchema');
 const server = express();
+const Relay = require('react-relay');
 
 //Keep logs
 server.use(logger('dev'));
@@ -43,9 +44,6 @@ const connectBackend = async () => await
             if (err) throw new Error(err.message);
             const db = client.db('NodeWorks');
             console.log('Connected to MongoDB server');
-            //Cache the Schema
-            require('./cache');
-
             //Create API endpoint
             server.use('/api', graphqlHTTP({
                 schema,

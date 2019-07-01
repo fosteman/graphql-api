@@ -1,8 +1,6 @@
 const {MongoClient} = require("mongodb");
 const dotenv = require('dotenv');
 if (process.env.NODE_ENV !== 'production') require('dotenv').config();
-console.log(process.env.MONGODB_URI);
-//require('./.env');
 const cors = require('cors');
 const { ApolloServer, gql } = require('apollo-server-express');
 const express = require('express');

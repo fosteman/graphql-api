@@ -1,7 +1,6 @@
 const {MongoClient} = require("mongodb");
 const dotenv = require('dotenv');
 if (process.env.NODE_ENV !== 'production') require('dotenv').config();
-const createError = require('http-errors');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -9,7 +8,6 @@ const logger = require('morgan');
 const graphqlHTTP = require('express-graphql');
 const schema = require('./quoteSchema');
 const server = express();
-const Relay = require('react-relay');
 
 //Keep logs
 server.use(logger('dev'));

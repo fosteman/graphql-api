@@ -1,18 +1,27 @@
+const ObjectId = require("mongodb");
+
 module.exports = {
     Query: {
         /** Quotes **/
-        listQuotes: (_, args, {dataSources}) => dataSources.NodeWorks.collection('quote-collection').find().toArray().map(IdStringifier), //TODO args:limit
-        findQuote: (_, args, {dataSources}) => IdStringifier(dataSources.NodeWorks.collection('quote-collection').findOne({_id: args.id})),
-        countQuotes: (_, args, {dataSources}) => dataSources.NodeWorks.collection('quote-collection').count(),
-        randomQuote: (_, args, {dataSources}) => IdStringifier(dataSources.NodeWorks.collection('quote-collection').aggregate([{ $sample: { size: 1 } }]).toArray()[0]),
+        listQuotes: (_, args, {NodeWorks}) => NodeWorks.collection('quote-collection').find().toArray(),
+        //TODO args:limit, stringifyId
+
+        findQuote: (_, args, {NodeWorks}) => ResolveSingleItem(NodeWorks.collection('quote-collection').find()),
+//TODO Fix findOne
+        countQuotes: (_, args, {NodeWorks}) => NodeWorks.collection('quote-collection').countDocuments(),
+
+        randomQuote: (_, args, {NodeWorks}) => ResolveSingleItem(NodeWorks.collection('quote-collection').aggregate([{ $sample: { size: 1 } }])),
+
         /** Team-Management **/
     }
 };
 
-const IdStringifier = o => {
-    o._id = o._id.toString();
-    return o
-};
+async function ResolveSingleItem(o) {
+    //console.log(o);
+    let resolve = await o.toArray();
+    console.log(resolve);
+    return resolve[0]
+}
 //asnyc / await?
 const resolvers_2 = {
     Query: {

@@ -1,6 +1,8 @@
 const {MongoClient} = require("mongodb");
 const dotenv = require('dotenv');
 if (process.env.NODE_ENV !== 'production') require('dotenv').config();
+console.log(process.env.MONGODB_URI);
+//require('./.env');
 const cors = require('cors');
 const { ApolloServer, gql } = require('apollo-server-express');
 const express = require('express');
@@ -28,25 +30,28 @@ const corsConfig = cors({
 });
 app.options('*', corsConfig);
 
-const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    dataSources: async () => {
-        let MongoBackend = await MongoClient.connect(
-            process.env.MONGODB_URI,
-            { useNewUrlParser: true },
-            (err, client) => (err) ?
-                new Error(err.message) :
-                console.log('Connected to MongoDB backend.')
-        );
-        return {
-            NodeWorks: MongoBackend.db('NodeWorks'),
-            TeamManagement: MongoBackend.db('teams-api-data') // new db 'TeamManagement' is upcoming
-        };
-    }
-});
+async function MongoDataSourceConnection() {
+    await MongoClient.connect(
+        process.env.MONGODB_URI,
+        { useNewUrlParser: true },
+        (err, MongoBackend) => {
+            err ? console.error(err.message) : console.log('Connected to MongoDB backend.');
+            let NodeWorks = MongoBackend.db('NodeWorks');
+            let TeamManagement =
+                MongoBackend.db('teams-api-data'); // new db 'TeamManagement' is upcoming
+            const server = new ApolloServer({
+                typeDefs,
+                resolvers,
+                context: {NodeWorks, TeamManagement}
+            });
+            //require('./cache'); TODO: fix caching
+            server.applyMiddleware({ app, path: '/api' });
 
-server.applyMiddleware({ app, path: '/api' });
+        }
+    );
+}
+MongoDataSourceConnection();
+
 
 app.listen(process.env.PORT || 3006,() => {
     console.log(`🚀 Server ready`);

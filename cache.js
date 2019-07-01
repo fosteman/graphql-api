@@ -3,7 +3,7 @@ const path = require('path');
 const {introspectionQuery} = require('graphql/utilities');
 const {graphql} = require('graphql');
 const babelRelayPlugin = require('babel-relay-plugin');
-const schema = require('./quoteSchema');
+const schema = require('./apollo.schema');
 
 graphql(schema, introspectionQuery)
     .then(result => {
@@ -13,5 +13,5 @@ graphql(schema, introspectionQuery)
             );
         console.log('Schema cached!');
     })
-    .finally(() => module.exports = babelRelayPlugin(require('./cachedSchema').data))
+    .then(() => module.exports = babelRelayPlugin(require('./cachedSchema').data))
     .catch(err => console.log('Caching Failed!', err.message));

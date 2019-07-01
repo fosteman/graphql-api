@@ -5,6 +5,7 @@ type Query {
     countQuotes: Int
     randomQuote: Quote!
     """Employees"""
+
     listEmployees : [Employee!]!
 	listProjects : [Project!]!
 	listTeams : [Team!]!
@@ -60,8 +61,8 @@ type Project {
 type Team{
 	_id : String!
 	TeamName : String
-	Projects : [Project]
 	Employees : [Employee]
 	TeamLead : Employee
+	Projects : [Project]
 }
 `;

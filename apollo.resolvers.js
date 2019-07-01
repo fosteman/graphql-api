@@ -19,6 +19,7 @@ module.exports = {
 
         listProjects: (_, args, {TeamManagement}) => reMapProjects(TeamManagement.collection('projects').find().toArray()),
 
+        listTeams: (_, args, {TeamManagement}) => reMapTeams(TeamManagement.collection('teams').find().toArray()),
     },
 };
 
@@ -39,7 +40,15 @@ async function reMapProjects(promise) {
     console.log('Remapping projects...');
     return L.forEach(prjArray, map);
 }
-
+async function reMapTeams(promise) {
+    const map = team => {
+        team.teamName = team.TeamName;
+        team.teamLead = team.TeamLead;
+    };
+    let teamArray = await promise;
+    console.log('Remapping teams...');
+    return L.forEach(teamArray, map);
+}
 //asnyc / await?
 const resolvers_2 = {
     Mutation: {

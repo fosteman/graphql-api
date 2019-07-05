@@ -4,12 +4,16 @@ type Query {
     findQuote(id: String!): Quote
     countQuotes: Int
     randomQuote: Quote!
+    
     """Employees"""
 
     listEmployees : [Employee!]!
 	listProjects : [Project!]!
 	listTeams : [Team!]!
-	getEmployeeById(id:String) : Employee
+	getEmployee(id: String!) : Employee
+	position(id: String!): Position
+	
+	
 }
 
 type Quote {
@@ -58,11 +62,11 @@ type Project {
 	projectEndDate : String
 }
 
-type Team{
+type Team {
 	_id : String!
-	TeamName : String
+	teamName : String
 	Employees : [Employee]
-	TeamLead : Employee
+	teamLead : Employee
 	Projects : [Project]
 }
 `;

@@ -21,16 +21,19 @@ module.exports = {
 
         listTeams: (_, args, {TeamManagement}) => reMapTeams(TeamManagement.collection('teams').find().toArray()),
 
-        getEmployeeById: (_, args, {TeamManagement}) => reMapQuotes(NodeWorks.collection('quote-collection').findOne({_id: ObjectID(args.id)})),
+        getEmployee: (_, args, {TeamManagement}) => {
+            let employee = reMapEmployees(TeamManagement.collection('employees').findOne({_id: ObjectID(args.id)}));
+            let position = ResolveSingleItem(TeamManagement.collection('positions').findOne({_id: ObjectID(args.id)}));
+            return employee;
+        },
 
-
-
+        position: (_, args, {TeamManagement}) => reMapPosition(TeamManagement.collection('positions').findOne({_id: ObjectID(args.id)})),
     },
 };
 
 async function ResolveSingleItem(o) {
     let resolve = await o.toArray();
-    console.log(resolve);
+    console.log('Resolving type: ...', resolve);
     return resolve[0]
 }
 
@@ -52,35 +55,41 @@ async function reMapTeams(promise) {
         team.teamLead = team.TeamLead;
     };
     let teamArray = await promise;
-    //console.log(teamArray);
     console.log('Remapping teams...');
     return L.forEach(teamArray, map);
 }
 
-async function reMapQuotes(data) {
-    let quotes = await data;
-    const map = q => {
+async function reMapQuotes(cursor) {
+    function map(q) {
         q.text = q.quoteText;
         q.author = q.quoteAuthor;
         return q;
-    };
-    console.log('Remapping quotes...');
-    if (quotes && L.isArray(quotes))
-        return L.forEach(quotes, map);
-     else
-        return map(quotes);
-};
-
+    }
+    let q = await cursor.toArray();
+    if (L.isArray(q) && q.length !== 1) {
+        console.log('Remapping type: quote...', q);
+        return L.forEach(q, map);
+    } else if (q.length === 1) {
+        return L.forEach(q, map)[0];
+    } else {
+        console.error('reMapQuotes received cursor and not array!');
+    }
+    }
 async function reMapEmployees(promise) {
     const map = e => {
-        e.position.name = e.TeamName;
     };
-    let teamArray = await promise;
+    let employeeArray = await promise;
     //console.log(teamArray);
-    console.log('Remapping teams...');
-    return L.forEach(teamArray, map);
+    console.log('Remapping employees...', employeeArray);
+    return L.forEach(employeeArray, map);
 }
 
+async function reMapPosition(promise) {
+    const map = p => {};
+    let position = await promise;
+    console.log("Remapping position...", position);
+    return position
+}
 
 
 

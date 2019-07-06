@@ -5,15 +5,14 @@ type Query {
     countQuotes: Int
     randomQuote: Quote!
     
-    """Employees"""
-
     listEmployees : [Employee!]!
 	listProjects : [Project!]!
 	listTeams : [Team!]!
-	getEmployee(id: String!) : Employee
-	position(id: String!): Position
 	
+	employee(id: ID!) : Employee
+	project: Project
 	
+	position: Position
 }
 
 type Quote {
@@ -22,17 +21,20 @@ type Quote {
     author : String
 }
 
-type Employee{
-	_id : String!
+type Employee {
 	position : Position
 	address : Address
-	contact : Contact
+	contact: Contact!
+	
+	id : ID!
 	hireDate : String
 	bonus : Int
+	firstName: String!
+	lastName: String!
 }
 
 type Position{
-	_id : String!
+	id : ID!
 	name : String
 	description : String
 	salary : Int
@@ -45,25 +47,21 @@ type Address{
 	zip : String
 }
 
-type Contact{
-	firstName : String
-	lastName : String
+type Contact {
 	phoneNumber : String
 	extension : String
-	email : String
-	gitHub : String
 }
 
 type Project {
-	_id : String!
-	projectName : String!
-	projectDescription : String
-	projectStartDate : String!
-	projectEndDate : String
+	id : ID!
+	name : String!
+	description : String
+	startDate : String
+	endDate : String
 }
 
 type Team {
-	_id : String!
+	id : ID!
 	teamName : String
 	Employees : [Employee]
 	teamLead : Employee

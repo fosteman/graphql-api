@@ -15,20 +15,48 @@ module.exports = {
 
         /** Team-Management **/
 
+        /* Employee */
+        employee: (_, args, {TeamManagement}) => {
+            console.log( 'Query:employee');
+            return TeamManagement.collection('employees').findOne({_id: ObjectID(args.id)})
+
+        },
+
+        position: (parent, args, {TeamManagement}) => {
+            console.log( 'Query:position',
+                TeamManagement.collection('positions').findOne({_id: ObjectID(parent.id)})
+            )
+        },
+
+        /* Project */
+
+
         listEmployees: (_, args, {TeamManagement}) => TeamManagement.collection('employees').find().toArray(),
 
         listProjects: (_, args, {TeamManagement}) => reMapProjects(TeamManagement.collection('projects').find().toArray()),
 
-        listTeams: (_, args, {TeamManagement}) => reMapTeams(TeamManagement.collection('teams').find().toArray()),
-
-        getEmployee: (_, args, {TeamManagement}) => {
-            let employee = reMapEmployees(TeamManagement.collection('employees').findOne({_id: ObjectID(args.id)}));
-            let position = ResolveSingleItem(TeamManagement.collection('positions').findOne({_id: ObjectID(args.id)}));
-            return employee;
-        },
-
-        position: (_, args, {TeamManagement}) => reMapPosition(TeamManagement.collection('positions').findOne({_id: ObjectID(args.id)})),
+        listTeams: (_, args, {TeamManagement}) => TeamManagement.collection('teams').find().toArray(),
     },
+    Employee: {
+        id: parent => parent._id,
+        hireDate: p => p.HireDate,
+        bonus: p => p.SalaryBonus,
+        firstName: p => p.FirstName,
+        lastName: p => p.LastName
+    },
+    Position: (_, args, {TeamManagement}) => {
+
+        console.log( 'Query:project');
+        return TeamManagement.collection('projects').findOne({_id: ObjectID(args.id)})
+    },
+    Project: {
+        id: p => p._id,
+        name: p => p.ProjectName,
+        description: p=> p.ProjectDescription,
+        startDate: p=> p.ProjectStartDate,
+        endDate: p=> p.ProjectEndDate,
+    },
+    Team: {}
 };
 
 async function ResolveSingleItem(o) {
@@ -60,11 +88,11 @@ async function reMapTeams(promise) {
 }
 
 async function reMapQuotes(cursor) {
-    function map(q) {
+    const map = (q) => {
         q.text = q.quoteText;
         q.author = q.quoteAuthor;
         return q;
-    }
+    };
     let q = await cursor.toArray();
     if (L.isArray(q) && q.length !== 1) {
         console.log('Remapping type: quote...', q);
@@ -75,13 +103,38 @@ async function reMapQuotes(cursor) {
         console.error('reMapQuotes received cursor and not array!');
     }
     }
-async function reMapEmployees(promise) {
+
+async function reMapEmployees(cursor) {
+    let q = await cursor;
+    console.log(q);
     const map = e => {
+        //contact, address referenced types  must be resolved
+        let employee = {
+            bonus: e.SalaryBonus,
+            hireDate: e.HireDate,
+            positionID: e.Position,
+        }
+        let address = {
+            address: e.AddressStreet,
+            state: e.AddressState,
+            city: e.AddressCity,
+            zip: e.AddressZip
+        };
+        let contact = {
+            firstName: e.FirstName,
+            lastName: e.lastName,
+            phoneNumber: e.PhoneNum,
+            extension: e.Extension,
+
+        };
+
+
+
+
+
     };
-    let employeeArray = await promise;
-    //console.log(teamArray);
-    console.log('Remapping employees...', employeeArray);
-    return L.forEach(employeeArray, map);
+    console.log('Remapping employees...', q);
+    return L.forEach(q, map);
 }
 
 async function reMapPosition(promise) {
@@ -96,7 +149,7 @@ async function reMapPosition(promise) {
 
 
 //asnyc / await?
-const resolvers_2 = {
+const mutators = {
     Mutation: {
         createPost: async (root, args, context, info) => {
             const res = await Posts.insertOne(args)

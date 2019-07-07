@@ -6,7 +6,7 @@ const { ApolloServer, gql } = require('apollo-server-express');
 const express = require('express');
 const typeDefs = require('./apollo.schema');
 const resolvers = require('./apollo.resolvers');
-
+const l = require('./winston');
 const app = express();
 
 //CORS
@@ -33,7 +33,7 @@ async function MongoDataSourceConnection() {
         process.env.MONGODB_URI,
         { useNewUrlParser: true },
         (err, MongoBackend) => {
-            err ? console.error(err.message) : console.log('Connected to MongoDB backend.');
+            err ? console.error(err.message) : l.info('Connected to MongoDB backend.');
             let NodeWorks = MongoBackend.db('NodeWorks');
             let TeamManagement =
                 MongoBackend.db('teams-api-data'); // new db 'TeamManagement' is upcoming
@@ -52,5 +52,5 @@ MongoDataSourceConnection();
 
 
 app.listen(process.env.PORT || 3006,() => {
-    console.log(`🚀 Server ready`);
+   l.info(`🚀 Server ready`);
 });

@@ -63,8 +63,8 @@ type Project {
 type Team {
 	id : ID!
 	teamName : String
-	Employees : [Employee]
 	teamLead : Employee
-	Projects : [Project]
+	employees : [Employee]
+	projects : [Project]
 }
 `;

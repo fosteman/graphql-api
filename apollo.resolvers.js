@@ -1,5 +1,6 @@
 const ObjectID = require('mongodb').ObjectID;
 const L = require('lodash');
+const l = require('./winston'); //logger
 
 module.exports = {
     Query: {
@@ -16,10 +17,9 @@ module.exports = {
         /** Team-Management **/
 
         /* Employee */
-        employee: (_, args, {TeamManagement}) => {
+        employee: async (_, args, {TeamManagement}) => {
             console.log( 'Query:employee');
-            return TeamManagement.collection('employees').findOne({_id: ObjectID(args.id)})
-
+           return await TeamManagement.collection('employees').findOne({_id: ObjectID(args.id)})
         },
 
         position: (parent, args, {TeamManagement}) => {
@@ -33,19 +33,36 @@ module.exports = {
 
         listEmployees: (_, args, {TeamManagement}) => TeamManagement.collection('employees').find().toArray(),
 
-        listProjects: (_, args, {TeamManagement}) => reMapProjects(TeamManagement.collection('projects').find().toArray()),
+        listProjects: (_, args, {TeamManagement}) => TeamManagement.collection('projects').find().toArray(),
 
         listTeams: (_, args, {TeamManagement}) => TeamManagement.collection('teams').find().toArray(),
     },
+
+/*
+    Employee: (p, args, {TeamManagement}) => {
+        console.log('Employee: fired!');
+        return {
+            id: p => p._id,
+            hireDate: p => p.HireDate,
+            bonus: p => p.SalaryBonus,
+            firstName: p => p.FirstName,
+            lastName: p => p.LastName
+        };
+    },
+*/
     Employee: {
-        id: parent => parent._id,
+        id: (...p) => {
+            l.info('Employee.id fired with args: ', {...p});
+            return p._id
+        },
         hireDate: p => p.HireDate,
         bonus: p => p.SalaryBonus,
         firstName: p => p.FirstName,
         lastName: p => p.LastName
     },
-    Position: (_, args, {TeamManagement}) => {
 
+
+    Position: (_, args, {TeamManagement}) => {
         console.log( 'Query:project');
         return TeamManagement.collection('projects').findOne({_id: ObjectID(args.id)})
     },
@@ -56,7 +73,9 @@ module.exports = {
         startDate: p=> p.ProjectStartDate,
         endDate: p=> p.ProjectEndDate,
     },
-    Team: {}
+    Team: {
+
+    }
 };
 
 async function ResolveSingleItem(o) {

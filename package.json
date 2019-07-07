@@ -12,10 +12,12 @@
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
     "express-graphql": "^0.8.0",
+    "fetch": "^1.1.0",
     "graphql": "^14.4.1",
     "graphql-tag": "^2.10.1",
     "lodash": "^4.17.11",
     "mongodb": "^3.2.7",
-    "nodemon": "^1.19.1"
+    "nodemon": "^1.19.1",
+    "winston": "^3.2.1"
   }
 }
